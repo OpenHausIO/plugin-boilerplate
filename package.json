@@ -9,7 +9,8 @@
     "build": "grunt build",
     "compress": "grunt compress",
     "checksum": "grunt checksum",
-    "release": "grunt release"
+    "release": "grunt release",
+    "postinstall": "node ./wizard/wizard.mjs"
   },
   "repository": {
     "type": "git",
