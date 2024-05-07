@@ -1,3 +1,4 @@
+import { execSync } from "node:child_process";
 import { basename, join } from "node:path";
 import { cwd, env } from "node:process";
 import { rmSync } from "node:fs";
@@ -62,10 +63,15 @@ inquirer.prompt(questions).then((answers) => {
     }
 
     if (answers.remove_setup_wizard) {
+
+        execSync("npm config delete scripts.postinstall");
+        execSync("npm uninstall inquirer");
+
         rmSync(join(cwd(), "wizard"), {
             recursive: true,
             force: true
         });
+
     }
 
 }).catch((err) => {
