@@ -1,6 +1,7 @@
-import { basename } from "node:path";
+import { basename, join } from "node:path";
 import { cwd, env } from "node:process";
-import inquirer from 'inquirer';
+import { rmSync } from "node:fs";
+import inquirer from "inquirer";
 
 
 if (env.SKIP_WIZARD) {
@@ -39,7 +40,12 @@ const questions = [{
     name: "generate_uuid",
     message: "Generate plugin UUID",
     default: true
-}];
+}, {
+    type: "confirm",
+    name: "remove_setup_wizard",
+    message: "Remove setup wizard",
+    default: true
+},];
 
 inquirer.prompt(questions).then((answers) => {
 
@@ -55,11 +61,17 @@ inquirer.prompt(questions).then((answers) => {
         console.log(`UUID = ${generate_uuid()}`);
     }
 
-}).catch((error) => {
-    if (error.isTtyError) {
+    if (answers.remove_setup_wizard) {
+        rmSync(join(cwd(), "wizard"), {
+            recursive: true,
+            force: true
+        });
+    }
 
-        // Prompt couldn't be rendered in the current environment
-        console.error(error);
+}).catch((err) => {
+    if (err.isTtyError) {
+
+        console.error(err);
 
     } else {
 
