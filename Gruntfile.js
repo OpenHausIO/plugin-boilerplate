@@ -31,6 +31,7 @@ module.exports = function (grunt) {
                         "**/*.gitkeep",
                         "!Gruntfile.js",
                         "!node_modules/**",
+                        "!wizard/**"
                     ],
                     dest: PATH_BUILD,
                 }]
