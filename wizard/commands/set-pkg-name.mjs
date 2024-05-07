@@ -7,6 +7,8 @@ import { EOL } from "node:os";
 export default () => {
     try {
 
+        // use `execSync("npm config set name=foo");` instead?
+
         const json = JSON.parse(readFileSync(join(cwd(), "package.json")));
 
         json.name = basename(cwd());
