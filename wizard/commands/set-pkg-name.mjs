@@ -11,7 +11,7 @@ export default () => {
 
         const json = JSON.parse(readFileSync(join(cwd(), "package.json")));
 
-        json.name = basename(cwd());
+        json.name = basename(cwd()).toLowerCase();
 
         writeFileSync(join(cwd(), "package.json"), `${JSON.stringify(json, null, 2)}${EOL}`, {
             encoding: "utf8"
