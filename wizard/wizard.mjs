@@ -106,6 +106,7 @@ inquirer.prompt(questions).then((answers) => {
 
     let pkg = JSON.parse(readFileSync("./package.json"));
     pkg.author = answers.author;
+    delete pkg.scripts?.postinstall; // fix #22
 
     writeFileSync(join(cwd(), "package.json"), `${JSON.stringify(pkg, null, 2)}${EOL}`, {
         encoding: "utf8"
