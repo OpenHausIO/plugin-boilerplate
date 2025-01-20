@@ -1,8 +1,10 @@
 import { execSync } from "node:child_process";
 import { basename, join } from "node:path";
 import { cwd, env } from "node:process";
-import { rmSync } from "node:fs";
+import { rmSync, writeFileSync, readFileSync } from "node:fs";
+import { EOL } from "node:os";
 import inquirer from "inquirer";
+
 
 
 if (env.SKIP_WIZARD) {
@@ -46,9 +48,36 @@ const questions = [{
     name: "remove_setup_wizard",
     message: "Remove setup wizard",
     default: true
-},];
+}, {
+    type: "checkbox",
+    name: "intents",
+    message: "Component intents:",
+    choices: [
+        "devices", "endpoints", "mdns", "mqtt", "plugins",
+        "rooms", "scenes", "ssdp", "store", "users", "vault",
+        "webhooks"
+    ].map((v) => {
+        return {
+            name: v,
+            option: v
+        };
+    }),
+    pageSize: 12
+}, {
+    type: "input",
+    name: "author",
+    message: "Enther Plugin Author name:",
+    validate(input) {
+        if (input.trim() === "") {
+            return "Name cannot be empty!";
+        }
+        return true;
+    },
+}];
 
 inquirer.prompt(questions).then((answers) => {
+
+    let uuid = null;
 
     if (answers.delete_examples_folder) {
         delete_examples_folder();
@@ -59,7 +88,8 @@ inquirer.prompt(questions).then((answers) => {
     }
 
     if (answers.generate_uuid) {
-        console.log(`UUID = ${generate_uuid()}`);
+        uuid = generate_uuid();
+        console.log(`UUID = ${uuid}`);
     }
 
     if (answers.remove_setup_wizard) {
@@ -73,6 +103,25 @@ inquirer.prompt(questions).then((answers) => {
         });
 
     }
+
+    let pkg = JSON.parse(readFileSync("./package.json"));
+    pkg.author = answers.author;
+
+    writeFileSync(join(cwd(), "package.json"), `${JSON.stringify(pkg, null, 2)}${EOL}`, {
+        encoding: "utf8"
+    });
+
+    writeFileSync(join(cwd(), "metadata.json"), `${JSON.stringify({
+        name: pkg.name,
+        version: pkg.version,
+        intents: answers.intents,
+        author: pkg.author || "",
+        website: pkg.webiste || "",
+        description: pkg.description || "",
+        uuid
+    }, null, 2)}${EOL}`, {
+        encoding: "utf8"
+    });
 
 }).catch((err) => {
     if (err.isTtyError) {
